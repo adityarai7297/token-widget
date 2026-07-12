@@ -12,6 +12,29 @@ If you searched for a **cloud usage widget**, **Claude usage widget**, **Claude 
   <img src="https://raw.githubusercontent.com/adityarai7297/token-widget/main/docs/claude-cloud-usage-widget-dropdown.png" alt="Claude cloud usage display dropdown — 5-hour, weekly, and model usage bars with reset countdowns" width="360" />
 </p>
 
+## Download (no Terminal needed)
+
+**[↓ Download Token Widget for Mac (Apple Silicon)](https://github.com/adityarai7297/token-widget/releases/latest/download/Token-Widget-macOS.zip)**
+
+1. Download the zip from the link above (or the [Releases](https://github.com/adityarai7297/token-widget/releases) page)
+2. Double-click the zip to unpack **Token Widget.app**
+3. Drag **Token Widget** into your **Applications** folder
+4. Open it (see Gatekeeper note below)
+5. Look for the Claude usage widget in the **menu bar** (top-right)
+
+### First open on macOS (Gatekeeper)
+
+This build is not Apple-notarized yet, so macOS may say it can’t be opened.
+
+- **Finder** → right-click **Token Widget** → **Open** → **Open**
+- Or: **System Settings → Privacy & Security** → scroll down → **Open Anyway**
+
+After the first allow, it opens normally next time.
+
+Optional: **System Settings → General → Login Items** → add Token Widget so the cloud usage shortcut starts at login.
+
+**Requirements:** macOS 14+, Apple Silicon Mac (M1/M2/M3/M4…), a Claude account. Having [Claude Code](https://claude.ai/code) already signed in makes setup easiest.
+
 ## Why this Claude cloud usage widget?
 
 Claude’s web **cloud usage** page works, but it is slow to check while you are coding. Token Widget keeps a **cloud usage shortcut** in your menu bar:
@@ -22,8 +45,6 @@ Claude’s web **cloud usage** page works, but it is slow to check while you are
 - Second-accurate “resets in …” timers
 - One-click refresh — a practical **cloud usage shortcut** next to your clock
 
-**Keywords people use for this kind of tool:** Claude usage, cloud usage, cloud usage widget, cloud usage display, cloud usage shortcut, Claude Max usage, Anthropic rate limits, Claude Code usage meter, macOS menu bar usage monitor.
-
 ## Features
 
 | Feature | What you get |
@@ -33,33 +54,6 @@ Claude’s web **cloud usage** page works, but it is slow to check while you are
 | Reset timers | Second-accurate local countdown from Claude’s reset timestamps |
 | Sign-in | Imports **Claude Code** credentials when available, or browser OAuth |
 | Footprint | Menu bar only — no Dock icon |
-
-## Requirements
-
-- macOS **14** (Sonoma) or later
-- A Claude account with cloud usage limits (Pro, Max, etc.)
-- Optional: [Claude Code](https://claude.ai/code) already signed in (fastest setup)
-
-## Install this cloud usage widget
-
-### Build from source
-
-```bash
-git clone https://github.com/adityarai7297/token-widget.git
-cd token-widget
-brew install xcodegen
-xcode-select --install   # if needed
-./build.sh
-open "/Applications/Token Widget.app"
-```
-
-If macOS blocks the app: right-click → **Open** → **Open**, or allow it under **System Settings → Privacy & Security**.
-
-### Prebuilt downloads
-
-When available, grab a build from [Releases](https://github.com/adityarai7297/token-widget/releases), move **Token Widget** into `/Applications`, and launch it.
-
-Add it under **System Settings → General → Login Items** if you want the cloud usage widget at login.
 
 ## Sign in (connect Claude cloud usage)
 
@@ -79,13 +73,7 @@ Add it under **System Settings → General → Login Items** if you want the clo
 | **Refresh Now** (`⌘R`) | Force refresh from Claude’s usage API |
 | Hover tooltip | Quick 5-hour cloud usage summary |
 
-Usage percentages refresh about every **60 seconds** (and when you open the menu if data is stale). Countdown text updates every **second** locally — the timer stays accurate without constant API calls.
-
-## Who is this for?
-
-- Developers using **Claude** / **Claude Code** who watch **5-hour** and **weekly** limits
-- Anyone who wants a **macOS cloud usage widget** instead of refreshing the website
-- People searching for a **cloud usage shortcut**, **usage meter**, or **usage monitor** for Claude
+Usage percentages refresh about every **60 seconds** (and when you open the menu if data is stale). Countdown text updates every **second** locally.
 
 ## Privacy
 
@@ -94,49 +82,42 @@ Usage percentages refresh about every **60 seconds** (and when you open the menu
 - Network traffic is only Claude / Anthropic OAuth + usage APIs
 - No analytics SDK and no third-party tracking
 
-Delete that folder (or Sign Out) to clear local credentials.
-
-## Build from source (contributors)
+## Build from source (developers)
 
 ```bash
+git clone https://github.com/adityarai7297/token-widget.git
+cd token-widget
+brew install xcodegen
+xcode-select --install   # if needed
 ./build.sh
+open "/Applications/Token Widget.app"
 ```
 
-Optional environment variables:
+Optional env vars: `DEVELOPMENT_TEAM`, `CODE_SIGN_IDENTITY`, `SKIP_INSTALL=1`.
+
+Ship a zip for Releases:
 
 ```bash
-export DEVELOPMENT_TEAM=XXXXXXXXXX
-export CODE_SIGN_IDENTITY="Apple Development: Your Name (XXXXXXXXXX)"
-export SKIP_INSTALL=1
-```
-
-Or open in Xcode:
-
-```bash
-xcodegen generate
-open TokenWidget.xcodeproj
+./scripts/make-release-zip.sh
 ```
 
 ## Troubleshooting
 
 | Problem | Fix |
 | --- | --- |
-| Unidentified developer | Right-click → **Open**, or allow in Privacy & Security |
+| “App can’t be opened” / unidentified developer | Right-click → **Open**, or **Open Anyway** in Privacy & Security |
 | Not signed in | Sign In again; confirm Claude Code login or finish OAuth + copy code |
 | Rate limited | Wait; avoid hammering **Refresh Now** |
 | Stale cloud usage display | **Refresh Now**, or quit and reopen |
-| Clean install | Quit app, delete `~/Library/Application Support/TokenWidget/`, relaunch |
+| Intel Mac | Current release zip is **Apple Silicon only**; build from source on Intel for now |
 
 ## Contributing
 
-Issues and PRs welcome — especially releases/notarization, Intel testing, preferences, and onboarding.
-
-1. Fork → branch → focused PR  
-2. Describe the problem and the fix  
+Issues and PRs welcome — especially **Developer ID + notarization**, Intel builds, preferences, and onboarding.
 
 ## Related searches
 
-Claude cloud usage · cloud usage widget · cloud usage display · cloud usage shortcut · Claude usage menu bar · Anthropic usage limits · Claude Max 20x usage · Claude Code usage tracker · macOS Claude usage monitor
+Claude cloud usage · cloud usage widget · cloud usage display · cloud usage shortcut · Claude usage menu bar · Anthropic usage limits · Claude Max usage · Claude Code usage tracker · macOS Claude usage monitor
 
 ## License
 
