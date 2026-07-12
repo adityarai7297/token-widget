@@ -1,119 +1,116 @@
-# Token Widget
+# Claude Cloud Usage Widget for macOS — Token Widget
 
-A tiny macOS menu bar app that shows your **Claude** usage limits at a glance — 5-hour session, weekly, and model quotas — with live progress bars and second-accurate reset timers.
+**Token Widget** is an open-source **Claude cloud usage widget** for the Mac menu bar. It is a lightweight **cloud usage display** and **cloud usage shortcut** so you can see Claude **usage**, limits, and reset timers without opening the Anthropic dashboard.
 
-Built for people who live in Claude / Claude Code and don’t want to keep opening the web dashboard.
+If you searched for a **cloud usage widget**, **Claude usage widget**, **Claude Code usage**, **Anthropic usage monitor**, or a **menu bar cloud usage display**, this project is built for that.
 
 <p align="center">
-  <img src="docs/menubar.png" alt="Token Widget in the menu bar" width="280" />
+  <img src="https://raw.githubusercontent.com/adityarai7297/token-widget/main/docs/claude-cloud-usage-menubar-widget.png" alt="Claude cloud usage widget in the macOS menu bar — live usage bar and cooldown timer" width="320" />
 </p>
 
 <p align="center">
-  <img src="docs/menu.png" alt="Token Widget dropdown with usage bars" width="320" />
+  <img src="https://raw.githubusercontent.com/adityarai7297/token-widget/main/docs/claude-cloud-usage-widget-dropdown.png" alt="Claude cloud usage display dropdown — 5-hour, weekly, and model usage bars with reset countdowns" width="360" />
 </p>
+
+## Why this Claude cloud usage widget?
+
+Claude’s web **cloud usage** page works, but it is slow to check while you are coding. Token Widget keeps a **cloud usage shortcut** in your menu bar:
+
+- Live **cloud usage display** for the **5-hour** session limit
+- **Weekly** cloud usage and model-scoped usage (for example Fable)
+- Progress bars instead of hunting through the dashboard
+- Second-accurate “resets in …” timers
+- One-click refresh — a practical **cloud usage shortcut** next to your clock
+
+**Keywords people use for this kind of tool:** Claude usage, cloud usage, cloud usage widget, cloud usage display, cloud usage shortcut, Claude Max usage, Anthropic rate limits, Claude Code usage meter, macOS menu bar usage monitor.
 
 ## Features
 
-- **Menu bar strip** — usage bar, percent, and cooldown ring without opening a window
-- **Dropdown details** — 5-hour / Weekly / model rows with progress bars
-- **Second-accurate countdowns** — timers tick locally from Claude’s reset timestamps
-- **Easy sign-in** — imports an existing **Claude Code** login when possible; otherwise browser OAuth with auto code pickup
-- **Lightweight** — menu bar only (`LSUIElement`), no Dock icon
+| Feature | What you get |
+| --- | --- |
+| Menu bar **cloud usage widget** | Usage bar, percent, cooldown ring |
+| Dropdown **cloud usage display** | 5-hour / Weekly / model rows with bars |
+| Reset timers | Second-accurate local countdown from Claude’s reset timestamps |
+| Sign-in | Imports **Claude Code** credentials when available, or browser OAuth |
+| Footprint | Menu bar only — no Dock icon |
 
 ## Requirements
 
 - macOS **14** (Sonoma) or later
-- A Claude account (Pro / Max / etc. with usage limits)
-- Optional but nicest path: [Claude Code](https://claude.ai/code) already signed in on this Mac
+- A Claude account with cloud usage limits (Pro, Max, etc.)
+- Optional: [Claude Code](https://claude.ai/code) already signed in (fastest setup)
 
-## Install
+## Install this cloud usage widget
 
-### Option A — Build from source (recommended today)
+### Build from source
 
 ```bash
-# 1. Clone
 git clone https://github.com/adityarai7297/token-widget.git
 cd token-widget
-
-# 2. Tools
 brew install xcodegen
-xcode-select --install   # if you don't already have Xcode / CLT
-
-# 3. Build + install into /Applications
+xcode-select --install   # if needed
 ./build.sh
-
-# 4. Launch
 open "/Applications/Token Widget.app"
 ```
 
-First launch on a Mac that didn’t sign the build: right-click the app → **Open** → **Open**, or allow it in **System Settings → Privacy & Security**.
+If macOS blocks the app: right-click → **Open** → **Open**, or allow it under **System Settings → Privacy & Security**.
 
-### Option B — Prebuilt release
+### Prebuilt downloads
 
-When releases are published on GitHub, download the latest `.zip` / `.dmg` from the [Releases](https://github.com/adityarai7297/token-widget/releases) page, move **Token Widget** to `/Applications`, and open it.
+When available, grab a build from [Releases](https://github.com/adityarai7297/token-widget/releases), move **Token Widget** into `/Applications`, and launch it.
 
-> Tip: keep it in **System Settings → General → Login Items** if you want it at login.
+Add it under **System Settings → General → Login Items** if you want the cloud usage widget at login.
 
-## Sign in
+## Sign in (connect Claude cloud usage)
 
-1. Click the menu bar item → **Sign In…** (or let it prompt on first launch).
-2. If Claude Code is already logged in, Token Widget usually **imports those credentials** and you’re done.
-3. Otherwise a browser window opens for Claude OAuth:
-   - Approve access
-   - Copy the auth code when shown (**⌘C**)
-   - Token Widget detects the clipboard automatically — you don’t paste anywhere
-4. The menu bar updates with your live usage.
+1. Click the menu bar **cloud usage shortcut** → **Sign In…**
+2. Prefer the automatic path: if Claude Code is logged in, credentials are imported
+3. Or finish browser OAuth, copy the code (**⌘C**), and Token Widget picks it up
+4. Your **cloud usage display** updates in the menu bar
 
-**Sign out** anytime from the same menu.
+**Sign Out** is in the same menu.
 
-## Using it
+## How the cloud usage display works
 
-| Where | What you see |
+| Surface | Cloud usage information |
 | --- | --- |
-| Menu bar | Claude mark · session usage bar · `%` · cooldown ring · time left |
-| Dropdown | Plan header · each limit with bar + `%` · `resets in …` · last updated |
-| **Refresh Now** (`⌘R`) | Force a fresh pull from Claude’s usage API |
-| Tooltips | Hover the menu bar item for a quick 5-hour summary |
+| Menu bar widget | Session usage bar · `%` · cooldown · time left |
+| Dropdown | Each limit with progress bar · `%` · `resets in …` |
+| **Refresh Now** (`⌘R`) | Force refresh from Claude’s usage API |
+| Hover tooltip | Quick 5-hour cloud usage summary |
 
-Usage percentages refresh about every **60 seconds** (and when you open the menu if data is stale). Countdown text updates every **second** on your Mac — no need to hammer the API for that.
+Usage percentages refresh about every **60 seconds** (and when you open the menu if data is stale). Countdown text updates every **second** locally — the timer stays accurate without constant API calls.
+
+## Who is this for?
+
+- Developers using **Claude** / **Claude Code** who watch **5-hour** and **weekly** limits
+- Anyone who wants a **macOS cloud usage widget** instead of refreshing the website
+- People searching for a **cloud usage shortcut**, **usage meter**, or **usage monitor** for Claude
 
 ## Privacy
 
-- Tokens are stored **only on your Mac** at  
-  `~/Library/Application Support/TokenWidget/credentials.json` (mode `600`).
-- Usage cache / logs live in the same folder.
-- Network calls go to **Anthropic / Claude** OAuth + usage endpoints only.
-- There is **no** analytics backend and **no** third-party tracking in this app.
+- OAuth tokens stay on your Mac: `~/Library/Application Support/TokenWidget/credentials.json` (`600`)
+- Cache and logs stay in that folder
+- Network traffic is only Claude / Anthropic OAuth + usage APIs
+- No analytics SDK and no third-party tracking
 
-Sign out (or delete that folder) to wipe local credentials.
+Delete that folder (or Sign Out) to clear local credentials.
 
-## Build notes (contributors)
+## Build from source (contributors)
 
 ```bash
 ./build.sh
 ```
 
-What the script does:
-
-1. Runs `xcodegen generate`
-2. Builds a **Release** `.app` with `xcodebuild`
-3. Codesigns (your identity if set, otherwise ad-hoc)
-4. Copies the app to `/Applications/Token Widget.app`
-
-Useful env vars:
+Optional environment variables:
 
 ```bash
-# Your Apple team ID (from developer.apple.com) — optional for local ad-hoc builds
 export DEVELOPMENT_TEAM=XXXXXXXXXX
-
-# Prefer a specific signing identity (optional)
 export CODE_SIGN_IDENTITY="Apple Development: Your Name (XXXXXXXXXX)"
-
-# Skip installing into /Applications
 export SKIP_INSTALL=1
 ```
 
-Open the generated project in Xcode if you prefer:
+Or open in Xcode:
 
 ```bash
 xcodegen generate
@@ -122,29 +119,24 @@ open TokenWidget.xcodeproj
 
 ## Troubleshooting
 
-| Problem | Try this |
+| Problem | Fix |
 | --- | --- |
-| App won’t open (“unidentified developer”) | Right-click → **Open**, or allow under Privacy & Security |
-| Always “Not signed in” | **Sign In…** again; confirm Claude Code login, or finish browser OAuth + copy the code |
-| Rate limited | Wait a bit; avoid spamming **Refresh Now** — Claude’s usage API throttles aggressive clients |
-| Bars stuck / old | **Refresh Now**, or quit and reopen the app |
-| Want a clean slate | Quit the app, delete `~/Library/Application Support/TokenWidget/`, relaunch |
+| Unidentified developer | Right-click → **Open**, or allow in Privacy & Security |
+| Not signed in | Sign In again; confirm Claude Code login or finish OAuth + copy code |
+| Rate limited | Wait; avoid hammering **Refresh Now** |
+| Stale cloud usage display | **Refresh Now**, or quit and reopen |
+| Clean install | Quit app, delete `~/Library/Application Support/TokenWidget/`, relaunch |
 
 ## Contributing
 
-Issues and PRs are welcome.
+Issues and PRs welcome — especially releases/notarization, Intel testing, preferences, and onboarding.
 
-1. Fork the repo
-2. Create a branch (`feat/…`, `fix/…`)
-3. Keep changes focused — UI polish, reliability, and docs help a lot
-4. Open a PR describing what & why
+1. Fork → branch → focused PR  
+2. Describe the problem and the fix  
 
-Ideas that would help the community:
+## Related searches
 
-- Notarized / GitHub Actions release artifacts
-- Intel Mac support testing
-- Preferences (poll interval, which rows to show, launch at login toggle)
-- Better first-run onboarding
+Claude cloud usage · cloud usage widget · cloud usage display · cloud usage shortcut · Claude usage menu bar · Anthropic usage limits · Claude Max 20x usage · Claude Code usage tracker · macOS Claude usage monitor
 
 ## License
 
@@ -152,4 +144,4 @@ Ideas that would help the community:
 
 ---
 
-**Not affiliated with Anthropic.** Claude® is a trademark of Anthropic PBC. This is an unofficial community tool.
+**Not affiliated with Anthropic.** Claude® is a trademark of Anthropic PBC. Unofficial community **cloud usage widget**.
