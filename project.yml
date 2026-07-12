@@ -1,0 +1,36 @@
+name: TokenWidget
+options:
+  bundleIdPrefix: com.adi
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.2.0"
+    CURRENT_PROJECT_VERSION: "3"
+    CODE_SIGN_STYLE: Automatic
+    # Leave empty for contributors; set DEVELOPMENT_TEAM in the environment or Xcode.
+    DEVELOPMENT_TEAM: ""
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    ENABLE_HARDENED_RUNTIME: YES
+targets:
+  TokenWidget:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.adi.token-widget
+        INFOPLIST_FILE: App/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: App/Resources/TokenWidget.entitlements
+        PRODUCT_NAME: Token Widget
+        GENERATE_INFOPLIST_FILE: NO
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks"
+    entitlements:
+      path: App/Resources/TokenWidget.entitlements
+    scheme:
+      testTargets: []
