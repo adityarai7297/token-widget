@@ -21,7 +21,12 @@ targets:
     platform: macOS
     sources:
       - path: App
+        excludes:
+          - Resources/**
       - path: Shared
+      - path: App/Resources/ClaudeMark.png
+        buildPhase: resources
+        type: file
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.adi.token-widget

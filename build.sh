@@ -35,11 +35,11 @@ fi
 
 xcodegen generate
 
-echo "Building for $ARCH…"
+echo "Building for ${ARCH}..."
 xcodebuild -scheme TokenWidget -configuration Release \
   -derivedDataPath "$ROOT/build/DerivedData" \
-  -destination "platform=macOS,arch=$ARCH" \
-  ONLY_ACTIVE_ARCH=YES "ARCHS=$ARCH" \
+  -destination "platform=macOS,arch=${ARCH}" \
+  ONLY_ACTIVE_ARCH=YES "ARCHS=${ARCH}" \
   CODE_SIGN_STYLE=Automatic \
   "${TEAM_ARGS[@]}" \
   build
@@ -71,9 +71,9 @@ if [[ "${SKIP_INSTALL:-0}" != "1" ]]; then
   DEST="/Applications/Token Widget.app"
   rm -rf "$DEST"
   cp -R "$APP" "$DEST"
-  echo "Installed → $DEST"
+  echo "Installed -> $DEST"
   echo "Open with: open \"$DEST\""
 else
-  echo "Built → $APP"
+  echo "Built -> $APP"
   echo "Skipped install (SKIP_INSTALL=1)."
 fi

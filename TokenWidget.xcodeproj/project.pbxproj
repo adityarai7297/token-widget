@@ -10,6 +10,7 @@
 		01C97BACD1E1704F1AB3D850 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AEFE1953B10D84E342EB37 /* LoginView.swift */; };
 		079240350C00A73B07E90CE8 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719A6BEAB9186C841D8DE45C /* AppConstants.swift */; };
 		08DCADDDB92648A8D3C0B1CC /* MenuUsageRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BEEAD7653F1081040D573B /* MenuUsageRowView.swift */; };
+		0949D4BE138D2BD88C73F15F /* ClaudeMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0533C193C824FA229012DF66 /* ClaudeMark.png */; };
 		50D74F32D3DF3D2445DC158D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF468A286860638FF9DC760 /* AppDelegate.swift */; };
 		6F4DCC5387301641930E3344 /* UsageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EEA6CB3F5C2A101B989472 /* UsageService.swift */; };
 		951C848BEE20CECF1472B108 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6316603B5B848A08DFE99C /* SharedStore.swift */; };
@@ -20,15 +21,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0533C193C824FA229012DF66 /* ClaudeMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ClaudeMark.png; sourceTree = "<group>"; };
 		10EEA6CB3F5C2A101B989472 /* UsageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageService.swift; sourceTree = "<group>"; };
 		4FF468A286860638FF9DC760 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		719A6BEAB9186C841D8DE45C /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		793E594E785C0E5193AB3A5A /* TokenWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D2446E20EFB284D6FF67D9B /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		91BEEAD7653F1081040D573B /* MenuUsageRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuUsageRowView.swift; sourceTree = "<group>"; };
-		9FA9B045D95264844974CF84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BA6316603B5B848A08DFE99C /* SharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStore.swift; sourceTree = "<group>"; };
-		D747EFBD22A7FAC5D9E9EA4E /* TokenWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenWidget.entitlements; sourceTree = "<group>"; };
 		DAE5BDB08DFFEDA8B2D2F455 /* StatusBarUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarUsageView.swift; sourceTree = "<group>"; };
 		DE55FC4EBFD769DDCED56A60 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		E5AEFE1953B10D84E342EB37 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -39,8 +39,7 @@
 		29C793FBA88133FF2286286D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9FA9B045D95264844974CF84 /* Info.plist */,
-				D747EFBD22A7FAC5D9E9EA4E /* TokenWidget.entitlements */,
+				0533C193C824FA229012DF66 /* ClaudeMark.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -103,6 +102,7 @@
 			buildConfigurationList = D5B6F046BC6844A0BCFA43AC /* Build configuration list for PBXNativeTarget "TokenWidget" */;
 			buildPhases = (
 				63D9A393C953852A3844F2EB /* Sources */,
+				8FD8741532D735F675BF31B8 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -125,7 +125,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					504652AB0A44C7F228C8ED3F = {
-						DevelopmentTeam = XK6AQX4LZN;
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -148,6 +148,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8FD8741532D735F675BF31B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0949D4BE138D2BD88C73F15F /* ClaudeMark.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		63D9A393C953852A3844F2EB /* Sources */ = {
@@ -207,7 +218,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = XK6AQX4LZN;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -268,7 +279,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = XK6AQX4LZN;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
