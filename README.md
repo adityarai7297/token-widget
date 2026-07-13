@@ -24,12 +24,14 @@ If you searched for a **cloud usage widget**, **Claude usage widget**, **Claude 
 
 ### First open on macOS (Gatekeeper)
 
-This build is not Apple-notarized yet, so macOS may say it can’t be opened.
+Prefer the **notarized** build from [Releases](https://github.com/adityarai7297/token-widget/releases/latest) — it should open with a normal double-click.
+
+If macOS still warns (older non-notarized zip):
 
 - **Finder** → right-click **Token Widget** → **Open** → **Open**
-- Or: **System Settings → Privacy & Security** → scroll down → **Open Anyway**
+- Or: **System Settings → Privacy & Security** → **Open Anyway**
 
-After the first allow, it opens normally next time.
+Maintainers: see [docs/NOTARIZE.md](docs/NOTARIZE.md) for Developer ID + notarization.
 
 Optional: **System Settings → General → Login Items** → add Token Widget so the cloud usage shortcut starts at login.
 
