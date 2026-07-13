@@ -255,8 +255,8 @@ enum AuthError: LocalizedError {
             return "Sign in to Claude to continue"
         case .keychainWriteFailed(let status):
             return "Could not save credentials (\(status))"
-        case .refreshFailed(let status, let body):
-            return "Auth failed (\(status)): \(body)"
+        case .refreshFailed(let status, _):
+            return "Auth failed (\(status))"
         case .loginCancelled:
             return "Sign-in cancelled"
         }

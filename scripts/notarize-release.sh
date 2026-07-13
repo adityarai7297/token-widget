@@ -6,15 +6,15 @@
 #   2. App Store Connect API key for notarytool (or a keychain profile)
 #
 # Env (API key auth):
-#   APPLE_API_KEY_PATH   path to AuthKey_XXXX.p8
-#   APPLE_API_KEY_ID     e.g. 7V5M44TZCG
-#   APPLE_API_ISSUER    UUID from App Store Connect → Users and Access → Integrations
+#   APPLE_API_KEY_PATH   path to AuthKey_XXXXXX.p8
+#   APPLE_API_KEY_ID     App Store Connect key id
+#   APPLE_API_ISSUER     App Store Connect issuer UUID
 #
 # Or keychain profile:
 #   NOTARY_PROFILE      name from: xcrun notarytool store-credentials
 #
 # Optional:
-#   DEVELOPMENT_TEAM    default XK6AQX4LZN
+#   DEVELOPMENT_TEAM    Apple Team ID (required for signing)
 #   RELEASE_TAG         e.g. v1.2.1 (if set with PUBLISH=1, uploads to GitHub)
 #   PUBLISH=1           create/update GitHub release with the notarized zip
 set -euo pipefail
@@ -22,13 +22,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-TEAM="${DEVELOPMENT_TEAM:-XK6AQX4LZN}"
+die() { echo "error: $*" >&2; exit 1; }
+
+TEAM="${DEVELOPMENT_TEAM:-}"
+[[ -n "$TEAM" ]] || die "set DEVELOPMENT_TEAM to your Apple Team ID"
+
 OUT_DIR="$ROOT/build/release"
 APP_NAME="Token Widget.app"
 ZIP_NAME="Token-Widget-macOS.zip"
 STAGING="$OUT_DIR/staging"
-
-die() { echo "error: $*" >&2; exit 1; }
 
 need_cmd() { command -v "$1" >/dev/null 2>&1 || die "missing command: $1"; }
 

@@ -6,6 +6,13 @@ build/
 *_creds.json
 # Local runtime data (tokens + usage cache)
 **/credentials.json
+# Signing / notary secrets (never commit)
+*.p8
+*.p12
+*.pem
+*.key
+AuthKey_*
+developerID_*.cer
 # Xcode / xcodegen noise
 DerivedData/
 *.moved-aside
