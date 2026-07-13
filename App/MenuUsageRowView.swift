@@ -1,6 +1,7 @@
 import AppKit
 
 /// Custom NSMenu row: title + usage progress bar + reset countdown.
+/// Keeps a compact content width so NSMenu stretching doesn't shove % to the far right.
 final class MenuUsageRowView: NSView {
     private let titleLabel = NSTextField(labelWithString: "")
     private let percentLabel = NSTextField(labelWithString: "")
@@ -9,13 +10,15 @@ final class MenuUsageRowView: NSView {
     private let fillLayer = CALayer()
 
     private var percent: Int = 0
+    private var preferredWidth: CGFloat = 200
 
-    private let rowWidth: CGFloat = 248
     private let rowHeight: CGFloat = 50
     private let hInset: CGFloat = 14
     private let barHeight: CGFloat = 6
     private let percentWidth: CGFloat = 34
     private let gapBelowBar: CGFloat = 6
+    private let minWidth: CGFloat = 180
+    private let maxWidth: CGFloat = 220
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -35,7 +38,7 @@ final class MenuUsageRowView: NSView {
         percentLabel.stringValue = "\(self.percent)%"
         resetLabel.stringValue = "resets in \(resetText)"
         fillLayer.backgroundColor = Self.barColor(self.percent).cgColor
-        needsLayout = true
+        sizeToContent()
     }
 
     func updatePercent(_ percent: Int) {
@@ -51,6 +54,7 @@ final class MenuUsageRowView: NSView {
         let next = "resets in \(resetText)"
         guard resetLabel.stringValue != next else { return }
         resetLabel.stringValue = next
+        sizeToContent()
     }
 
     private func setup() {
@@ -66,6 +70,7 @@ final class MenuUsageRowView: NSView {
 
         resetLabel.font = .menuFont(ofSize: 11)
         resetLabel.textColor = .secondaryLabelColor
+        resetLabel.lineBreakMode = .byTruncatingTail
         resetLabel.isSelectable = false
 
         trackLayer.backgroundColor = NSColor.labelColor.withAlphaComponent(0.16).cgColor
@@ -82,14 +87,26 @@ final class MenuUsageRowView: NSView {
         layer?.addSublayer(trackLayer)
     }
 
+    private func sizeToContent() {
+        let resetW = ceil(resetLabel.sizeThatFits(NSSize(width: 10_000, height: 20)).width)
+        let titleW = ceil(titleLabel.sizeThatFits(NSSize(width: 10_000, height: 20)).width)
+        let rowContent = max(resetW, titleW + 8 + percentWidth)
+        preferredWidth = min(maxWidth, max(minWidth, hInset * 2 + rowContent + 2))
+        invalidateIntrinsicContentSize()
+        setFrameSize(intrinsicContentSize)
+        needsLayout = true
+    }
+
     override var intrinsicContentSize: NSSize {
-        NSSize(width: rowWidth, height: rowHeight)
+        NSSize(width: preferredWidth, height: rowHeight)
     }
 
     override func layout() {
         super.layout()
 
-        let width = max(rowWidth, bounds.width)
+        // Layout against preferred width only — ignore stretched menu bounds
+        // so the % stays next to the title instead of flying to the far right.
+        let width = preferredWidth
         let height = max(rowHeight, bounds.height)
         let contentW = width - hInset * 2
         let titleH: CGFloat = 16
@@ -97,16 +114,14 @@ final class MenuUsageRowView: NSView {
         let topPad: CGFloat = 5
         let titleToBar: CGFloat = 4
 
-        // AppKit y=0 is bottom. Stack title → bar → reset from the top.
         let titleY = height - topPad - titleH
         titleLabel.frame = CGRect(x: hInset, y: titleY, width: contentW - percentWidth - 6, height: titleH)
         percentLabel.frame = CGRect(x: width - hInset - percentWidth, y: titleY, width: percentWidth, height: titleH)
 
         let barY = titleY - titleToBar - barHeight
-        let barW = contentW
-        trackLayer.frame = CGRect(x: hInset, y: barY, width: barW, height: barHeight)
+        trackLayer.frame = CGRect(x: hInset, y: barY, width: contentW, height: barHeight)
 
-        let fillW = max(percent > 0 ? 2 : 0, barW * CGFloat(percent) / 100)
+        let fillW = max(percent > 0 ? 2 : 0, contentW * CGFloat(percent) / 100)
         fillLayer.frame = CGRect(x: 0, y: 0, width: fillW, height: barHeight)
 
         let resetY = barY - gapBelowBar - resetH

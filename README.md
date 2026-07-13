@@ -19,7 +19,7 @@ If you searched for a **cloud usage widget**, **Claude usage widget**, **Claude 
 1. Download the zip from the link above (or the [Releases](https://github.com/adityarai7297/token-widget/releases) page)
 2. Double-click the zip to unpack **Token Widget.app**
 3. Drag **Token Widget** into your **Applications** folder
-4. Open it (see Gatekeeper note below)
+4. Double-click to open — **v1.2.1+ is Developer ID signed and notarized by Apple**
 5. Look for the Claude usage widget in the **menu bar** (top-right)
 
 ### First open on macOS (Gatekeeper)

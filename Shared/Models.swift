@@ -221,7 +221,7 @@ enum Formatters {
         let h = (seconds % 86_400) / 3600
         let m = (seconds % 3600) / 60
         let s = seconds % 60
-        if d > 0 { return "\(d)d \(h)h \(m)m \(s)s" }
+        if d > 0 { return "\(d)d \(h)h \(m)m" }
         if h > 0 { return "\(h)h \(m)m \(s)s" }
         if m > 0 { return "\(m)m \(s)s" }
         return "\(s)s"

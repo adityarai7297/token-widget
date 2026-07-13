@@ -151,7 +151,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             for row in snapshot.rows {
                 let reset = Formatters.countdown(until: row.resetsAt)
                 let item = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-                let rowView = MenuUsageRowView(frame: NSRect(x: 0, y: 0, width: 248, height: 50))
+                let rowView = MenuUsageRowView(frame: .zero)
                 rowView.configure(title: row.title, percent: row.percent, resetText: reset)
                 item.view = rowView
                 item.isEnabled = false
@@ -169,7 +169,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             updatedAtMenuItem = updated
 
             if let lastRefreshNote, !lastRefreshNote.isEmpty {
-                let note = NSMenuItem(title: lastRefreshNote, action: nil, keyEquivalent: "")
+                let note = NSMenuItem(title: Self.compactMenuNote(lastRefreshNote), action: nil, keyEquivalent: "")
                 note.isEnabled = false
                 menu.addItem(note)
                 noteMenuItem = note
@@ -316,7 +316,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 openLogin()
             case .rateLimited:
                 lastRefreshNote = force
-                    ? "Rate limited — wait a few seconds and try again"
+                    ? "Rate limited — try again soon"
                     : nil
                 applySnapshot(SharedStore.load(), rebuildMenuIfNeeded: true)
             default:
@@ -392,8 +392,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         updatedAtMenuItem?.title = "Updated \(Formatters.relativeUpdated(snap.updatedAt))"
         if let note = lastRefreshNote, !note.isEmpty {
-            noteMenuItem?.title = note
+            noteMenuItem?.title = Self.compactMenuNote(note)
         }
+    }
+
+    /// Keep status notes short so they don't force a wide menu.
+    private static func compactMenuNote(_ note: String) -> String {
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.count <= 36 { return trimmed }
+        let idx = trimmed.index(trimmed.startIndex, offsetBy: 33)
+        return String(trimmed[..<idx]) + "…"
     }
 
     private func paintStatusBar(_ snap: UsageSnapshot) {
