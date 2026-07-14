@@ -14,6 +14,8 @@ A tiny macOS menu bar app that shows your **Claude** usage — 5-hour, weekly, a
 2. Unzip and drag **Token Widget** into **Applications**
 3. Open it — look for the Claude icon in the menu bar (top-right)
 
+Launches at login by default (toggle in the menu if you want that off).
+
 Requires macOS 14+ and a Claude account. Works best if [Claude Code](https://claude.ai/code) is already signed in.
 
 ## Sign in

@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -18,6 +19,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var noteMenuItem: NSMenuItem?
     private var isMenuOpen = false
     private var lastPaintedStatusSignature: String?
+    /// Opt-out: launch at login stays on unless the user turns it off in the menu.
+    private let launchAtLoginOptOutKey = "launchAtLoginOptOut"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         bootstrap()
@@ -32,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         try? FileManager.default.createDirectory(at: SharedStore.directoryURL, withIntermediateDirectories: true)
         Self.log("launch begin")
+        ensureLaunchAtLoginEnabledByDefault()
         setupStatusItem()
         // Show last-known usage immediately (don't wait on network).
         applySnapshot(SharedStore.load(), rebuildMenuIfNeeded: true)
@@ -191,6 +195,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(NSMenuItem(title: "Sign In…", action: #selector(menuLogin), keyEquivalent: "l"))
         menu.addItem(NSMenuItem(title: "Sign Out", action: #selector(menuLogout), keyEquivalent: ""))
         menu.addItem(.separator())
+
+        let launchItem = NSMenuItem(
+            title: "Launch at Login",
+            action: #selector(menuToggleLaunchAtLogin),
+            keyEquivalent: ""
+        )
+        launchItem.state = isLaunchAtLoginEnabled ? .on : .off
+        menu.addItem(launchItem)
+
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Token Widget", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem?.menu = menu
     }
@@ -206,6 +220,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         SharedStore.save(.needsLogin)
         applySnapshot(nil, rebuildMenuIfNeeded: true)
         openLogin()
+    }
+
+    private var isLaunchAtLoginEnabled: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    /// Register as a login item unless the user opted out from the menu.
+    private func ensureLaunchAtLoginEnabledByDefault() {
+        if UserDefaults.standard.bool(forKey: launchAtLoginOptOutKey) {
+            Self.log("launch at login opt-out")
+            return
+        }
+        let status = SMAppService.mainApp.status
+        Self.log("launch at login status=\(status.rawValue)")
+        guard status != .enabled else { return }
+        do {
+            try SMAppService.mainApp.register()
+            Self.log("launch at login registered → \(SMAppService.mainApp.status.rawValue)")
+        } catch {
+            Self.log("launch at login register failed: \(error)")
+        }
+    }
+
+    @objc private func menuToggleLaunchAtLogin() {
+        do {
+            if isLaunchAtLoginEnabled {
+                try SMAppService.mainApp.unregister()
+                UserDefaults.standard.set(true, forKey: launchAtLoginOptOutKey)
+                Self.log("launch at login disabled")
+            } else {
+                try SMAppService.mainApp.register()
+                UserDefaults.standard.set(false, forKey: launchAtLoginOptOutKey)
+                Self.log("launch at login enabled → \(SMAppService.mainApp.status.rawValue)")
+            }
+        } catch {
+            Self.log("launch at login toggle failed: \(error)")
+        }
+        if let snap = displayedSnapshot {
+            rebuildMenu(with: snap)
+        } else {
+            rebuildMenu(with: SharedStore.load())
+        }
     }
 
     func openLogin() {
