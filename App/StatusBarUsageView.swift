@@ -36,12 +36,12 @@ final class StatusBarUsageView: NSView {
         var x = hPad
 
         let pctAttrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium),
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .semibold),
+            .foregroundColor: NSColor.labelColor,
         ]
         let minsAttrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold),
+            .foregroundColor: NSColor.labelColor.withAlphaComponent(0.92),
         ]
 
         let logoRect = CGRect(

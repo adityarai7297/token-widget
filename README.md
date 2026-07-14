@@ -3,9 +3,7 @@
 A tiny macOS menu bar app that shows your **Claude** usage — 5-hour, weekly, and model limits — with live progress bars and reset timers.
 
 <p align="center">
-  <img src="docs/claude-cloud-usage-menubar-widget.png" alt="Menu bar" width="300" />
-  &nbsp;
-  <img src="docs/claude-cloud-usage-widget-dropdown.png" alt="Dropdown" width="280" />
+  <img src="docs/token-widget-screenshot.png" alt="Token Widget menu bar and dropdown" width="760" />
 </p>
 
 ## Install

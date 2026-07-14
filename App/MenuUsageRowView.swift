@@ -63,13 +63,13 @@ final class MenuUsageRowView: NSView {
         titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.isSelectable = false
 
-        percentLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .medium)
-        percentLabel.textColor = .secondaryLabelColor
+        percentLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .semibold)
+        percentLabel.textColor = .labelColor
         percentLabel.alignment = .right
         percentLabel.isSelectable = false
 
         resetLabel.font = .menuFont(ofSize: 11)
-        resetLabel.textColor = .secondaryLabelColor
+        resetLabel.textColor = NSColor.labelColor.withAlphaComponent(0.82)
         resetLabel.lineBreakMode = .byTruncatingTail
         resetLabel.isSelectable = false
 
