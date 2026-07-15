@@ -5,6 +5,9 @@ import AppKit
 /// 1. Try importing tokens from Claude Code (if already logged in there)
 /// 2. Otherwise open the browser and auto-detect the code when you copy it
 struct LoginView: View {
+    /// When true (after Sign Out / dead tokens), skip Claude Code import and
+    /// go straight to the browser — those tokens may be the ones that failed.
+    var skipClaudeCodeImport: Bool = false
     var onSuccess: () -> Void
     var onCancel: () -> Void
 
@@ -115,15 +118,20 @@ struct LoginView: View {
 
     @MainActor
     private func bootstrap() async {
-        // 1) Already have Claude Code? Import and done.
-        do {
-            _ = try CredentialStore.importFromClaudeCode()
-            status = "Imported your Claude Code login"
-            phase = .exchanging
-            onSuccess()
-            return
-        } catch {
-            // Fall through to browser flow.
+        // 1) Already have Claude Code? Import and validate before finishing.
+        if !skipClaudeCodeImport {
+            do {
+                _ = try CredentialStore.importFromClaudeCode()
+                status = "Imported your Claude Code login — verifying…"
+                phase = .exchanging
+                _ = try await CredentialStore.refreshOAuthIfNeeded(force: true)
+                status = "Imported your Claude Code login"
+                onSuccess()
+                return
+            } catch {
+                // Stale Claude Code tokens — clear and use the browser instead.
+                CredentialStore.clearOwnedOAuth()
+            }
         }
 
         // 2) Browser + clipboard auto-detect

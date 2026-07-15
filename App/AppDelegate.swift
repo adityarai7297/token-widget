@@ -80,7 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !hasCreds {
             Self.log("no credentials → login")
             SharedStore.save(.needsLogin)
-            openLogin()
+            applySnapshot(nil, rebuildMenuIfNeeded: true)
+            openLogin(preferBrowser: true)
         } else {
             let existing = SharedStore.load()
             // Pull fresh usage if cache is older than ~45s.
@@ -191,9 +192,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(.separator())
         }
 
-        menu.addItem(NSMenuItem(title: "Refresh Now", action: #selector(menuRefresh), keyEquivalent: "r"))
-        menu.addItem(NSMenuItem(title: "Sign In…", action: #selector(menuLogin), keyEquivalent: "l"))
-        menu.addItem(NSMenuItem(title: "Sign Out", action: #selector(menuLogout), keyEquivalent: ""))
+        addMenuItem(menu, title: "Refresh Now", action: #selector(menuRefresh), key: "r")
+        addMenuItem(menu, title: "Sign In…", action: #selector(menuLogin), key: "l")
+        addMenuItem(menu, title: "Sign Out", action: #selector(menuLogout), key: "")
         menu.addItem(.separator())
 
         let launchItem = NSMenuItem(
@@ -201,6 +202,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             action: #selector(menuToggleLaunchAtLogin),
             keyEquivalent: ""
         )
+        launchItem.target = self
         launchItem.state = isLaunchAtLoginEnabled ? .on : .off
         menu.addItem(launchItem)
 
@@ -209,17 +211,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem?.menu = menu
     }
 
+    private func addMenuItem(_ menu: NSMenu, title: String, action: Selector, key: String) {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        item.target = self
+        menu.addItem(item)
+    }
+
     @objc private func menuRefresh() {
         Self.log("manual refresh requested")
         refresh(force: true)
     }
-    @objc private func menuLogin() { openLogin() }
+
+    @objc private func menuLogin() {
+        // Explicit Sign In must always show the browser flow — never silently
+        // refresh stale tokens (that looks like the button does nothing).
+        openLogin(preferBrowser: true)
+    }
 
     @objc private func menuLogout() {
-        CredentialStore.clearOwnedOAuth()
-        SharedStore.save(.needsLogin)
-        applySnapshot(nil, rebuildMenuIfNeeded: true)
-        openLogin()
+        beginSignedOut(reason: "manual sign-out")
     }
 
     private var isLaunchAtLoginEnabled: Bool {
@@ -264,16 +274,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
-    func openLogin() {
-        // Already signed in — never flash an auto-closing sheet.
-        if CredentialStore.hasCredentials() {
-            refresh(force: true)
-            return
-        }
-        if (try? CredentialStore.importFromClaudeCode()) != nil {
-            Self.log("openLogin imported Claude Code creds")
-            refresh(force: true)
-            return
+    /// Drop local tokens and show the sign-in UI. Stops the
+    /// refresh → auth-error → refresh loop when the grant is dead.
+    private func beginSignedOut(reason: String) {
+        Self.log("signed out (\(reason))")
+        refreshTask?.cancel()
+        isRefreshing = false
+        CredentialStore.clearOwnedOAuth()
+        lastRefreshNote = nil
+        SharedStore.save(.needsLogin)
+        applySnapshot(nil, rebuildMenuIfNeeded: true)
+        openLogin(preferBrowser: true)
+    }
+
+    /// - Parameter preferBrowser: When true (Sign In / Sign Out / auth failure),
+    ///   always present the login window. Never silently refresh leftover tokens.
+    func openLogin(preferBrowser: Bool = false) {
+        if !preferBrowser {
+            // Cold start / deep link — reuse existing tokens when possible.
+            if CredentialStore.hasCredentials() {
+                refresh(force: true)
+                return
+            }
+            if (try? CredentialStore.importFromClaudeCode()) != nil {
+                Self.log("openLogin imported Claude Code creds")
+                refresh(force: true)
+                return
+            }
         }
 
         if let loginWindow, loginWindow.isVisible {
@@ -282,7 +309,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             return
         }
 
+        // Close any leftover non-visible window before creating a new one.
+        loginWindow?.close()
+        loginWindow = nil
+
         let view = LoginView(
+            skipClaudeCodeImport: preferBrowser,
             onSuccess: { [weak self] in
                 self?.loginWindow?.close()
                 self?.loginWindow = nil
@@ -330,7 +362,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             Self.log("refresh aborted — no credentials")
             SharedStore.save(.needsLogin)
             applySnapshot(nil, rebuildMenuIfNeeded: true)
-            openLogin()
+            // Manual refresh while signed out → show the login sheet.
+            // Background polls must not re-pop it (or re-import Claude Code).
+            if force {
+                openLogin(preferBrowser: true)
+            }
             return
         }
 
@@ -358,18 +394,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } catch let error as AuthError {
             guard generation == refreshGeneration else { return }
             Self.log("auth error \(error)")
-            lastRefreshNote = error.localizedDescription
-            SharedStore.save(.needsLogin)
-            applySnapshot(nil, rebuildMenuIfNeeded: true)
-            openLogin()
+            // Dead refresh tokens must be cleared — otherwise openLogin() keeps
+            // calling refresh() and Sign In appears to do nothing.
+            beginSignedOut(reason: "auth error")
         } catch let error as UsageError {
             guard generation == refreshGeneration else { return }
             Self.log("usage error \(error)")
             switch error {
             case .http(let code, _) where code == 401 || code == 403:
-                lastRefreshNote = "Session expired"
-                SharedStore.save(.needsLogin)
-                openLogin()
+                beginSignedOut(reason: "session expired (\(code))")
             case .rateLimited:
                 lastRefreshNote = force
                     ? "Rate limited — try again soon"
