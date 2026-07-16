@@ -257,4 +257,27 @@ enum Formatters {
         if s < 3600 { return "\(s / 60)m ago" }
         return "\(s / 3600)h ago"
     }
+
+    /// Menu line for last-successful fetch; appends “· cached” when stale / rate-limited.
+    static func updatedMenuTitle(date: Date?, isCached: Bool, now: Date = Date()) -> String {
+        let base = "Updated \(relativeUpdated(date, now: now))"
+        return isCached ? "\(base) · cached" : base
+    }
+}
+
+/// Shared usage UX helpers (menu bar + dropdown).
+enum UsageDisplay {
+    /// Age after which we treat the last successful snapshot as stale.
+    static let staleAfter: TimeInterval = 90
+
+    static func isNearLimit(percent: Int) -> Bool {
+        percent >= 90 && percent < 100
+    }
+
+    static func resetCaption(percent: Int, countdown: String) -> String {
+        if percent >= 100 {
+            return "exhausted · resets in \(countdown)"
+        }
+        return "resets in \(countdown)"
+    }
 }

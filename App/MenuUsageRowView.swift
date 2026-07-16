@@ -36,7 +36,7 @@ final class MenuUsageRowView: NSView {
         self.percent = max(0, min(100, percent))
         titleLabel.stringValue = title
         percentLabel.stringValue = "\(self.percent)%"
-        resetLabel.stringValue = "resets in \(resetText)"
+        resetLabel.stringValue = Self.resetCaption(percent: self.percent, resetText: resetText)
         fillLayer.backgroundColor = Self.barColor(self.percent).cgColor
         sizeToContent()
     }
@@ -47,14 +47,32 @@ final class MenuUsageRowView: NSView {
         self.percent = clamped
         percentLabel.stringValue = "\(clamped)%"
         fillLayer.backgroundColor = Self.barColor(clamped).cgColor
+        // Keep exhausted / resets wording in sync with the new percent.
+        let resetPart = Self.resetCountdownPart(from: resetLabel.stringValue)
+        resetLabel.stringValue = Self.resetCaption(percent: clamped, resetText: resetPart)
+        sizeToContent()
         needsLayout = true
     }
 
     func updateResetText(_ resetText: String) {
-        let next = "resets in \(resetText)"
+        let next = Self.resetCaption(percent: percent, resetText: resetText)
         guard resetLabel.stringValue != next else { return }
         resetLabel.stringValue = next
         sizeToContent()
+    }
+
+    private static func resetCaption(percent: Int, resetText: String) -> String {
+        if percent >= 100 {
+            return "exhausted · resets in \(resetText)"
+        }
+        return "resets in \(resetText)"
+    }
+
+    private static func resetCountdownPart(from caption: String) -> String {
+        if let range = caption.range(of: "resets in ") {
+            return String(caption[range.upperBound...])
+        }
+        return caption
     }
 
     private func setup() {
@@ -129,11 +147,16 @@ final class MenuUsageRowView: NSView {
     }
 
     private static func barColor(_ percent: Int) -> NSColor {
+        if percent >= 100 {
+            return NSColor(calibratedRed: 0.88, green: 0.28, blue: 0.28, alpha: 1)
+        }
+        if percent >= 90 {
+            return NSColor(calibratedRed: 0.92, green: 0.55, blue: 0.18, alpha: 1)
+        }
         switch percent {
         case ..<50: return NSColor(calibratedRed: 0.35, green: 0.72, blue: 0.48, alpha: 1)
         case ..<75: return NSColor(calibratedRed: 0.90, green: 0.72, blue: 0.28, alpha: 1)
-        case ..<90: return NSColor(calibratedRed: 0.92, green: 0.48, blue: 0.22, alpha: 1)
-        default: return NSColor(calibratedRed: 0.88, green: 0.28, blue: 0.28, alpha: 1)
+        default: return NSColor(calibratedRed: 0.92, green: 0.48, blue: 0.22, alpha: 1)
         }
     }
 }

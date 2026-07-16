@@ -165,7 +165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
 
             let updated = NSMenuItem(
-                title: "Updated \(Formatters.relativeUpdated(snapshot.updatedAt))",
+                title: updatedMenuTitle(for: snapshot),
                 action: nil,
                 keyEquivalent: ""
             )
@@ -439,7 +439,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         for (idx, row) in snap.rows.enumerated() where idx < menuRowViews.count {
             menuRowViews[idx].updateResetText(Formatters.countdown(until: row.resetsAt))
         }
-        updatedAtMenuItem?.title = "Updated \(Formatters.relativeUpdated(snap.updatedAt))"
+        updatedAtMenuItem?.title = updatedMenuTitle(for: snap)
     }
 
     private func applySnapshot(_ snapshot: UsageSnapshot?, rebuildMenuIfNeeded: Bool) {
@@ -479,10 +479,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menuRowViews[idx].updatePercent(row.percent)
             menuRowViews[idx].updateResetText(Formatters.countdown(until: row.resetsAt))
         }
-        updatedAtMenuItem?.title = "Updated \(Formatters.relativeUpdated(snap.updatedAt))"
+        updatedAtMenuItem?.title = updatedMenuTitle(for: snap)
         if let note = lastRefreshNote, !note.isEmpty {
             noteMenuItem?.title = Self.compactMenuNote(note)
         }
+    }
+
+    private func updatedMenuTitle(for snap: UsageSnapshot) -> String {
+        Formatters.updatedMenuTitle(date: snap.updatedAt, isCached: isSnapshotCached(snap))
+    }
+
+    /// Stale snapshot or rate-limited — show “· cached” on the Updated line.
+    private func isSnapshotCached(_ snap: UsageSnapshot) -> Bool {
+        if let note = lastRefreshNote, note.localizedCaseInsensitiveContains("rate limited") {
+            return true
+        }
+        return Date().timeIntervalSince(snap.updatedAt) >= UsageDisplay.staleAfter
     }
 
     /// Keep status notes short so they don't force a wide menu.
@@ -499,19 +511,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusBarView = view
 
         if snap.status == .ok {
-            let fiveHour = snap.statusBarRows.first(where: { $0.label == "5H" })
-                ?? snap.statusBarRows.first
-            if let fiveHour {
-                view.model = .init(percent: fiveHour.percent, resetsAt: fiveHour.resetsAt)
-                let reset = Formatters.countdown(until: fiveHour.resetsAt)
-                item.button?.toolTip = "5-hour: \(fiveHour.percent)% · resets in \(reset)"
+            if let primary = snap.menuBarPrimary {
+                let nearLimit = snap.isNearLimitWarning && primary.percent < 100
+                let badge = primary.label == "W" ? "W" : nil
+                view.model = .init(
+                    percent: primary.percent,
+                    resetsAt: primary.resetsAt,
+                    badge: badge,
+                    nearLimit: nearLimit,
+                    showSignIn: false
+                )
+                let reset = Formatters.countdown(until: primary.resetsAt)
+                if primary.percent >= 100 {
+                    item.button?.toolTip = "\(primary.tooltipPrefix): exhausted · resets in \(reset)"
+                } else if nearLimit {
+                    item.button?.toolTip = "\(primary.tooltipPrefix): \(primary.percent)% · near limit · resets in \(reset)"
+                } else {
+                    item.button?.toolTip = "\(primary.tooltipPrefix): \(primary.percent)% · resets in \(reset)"
+                }
             } else {
-                view.model = .init(percent: 0)
+                view.model = .init(showSignIn: false)
                 item.button?.toolTip = "Claude Usage"
             }
+        } else if snap.status == .needsLogin {
+            view.model = .init(showSignIn: true)
+            item.button?.toolTip = "Sign in to Claude"
         } else {
-            view.model = .init(percent: 0)
-            item.button?.toolTip = snap.status == .needsLogin ? "Sign in to Claude" : (snap.message ?? "Error")
+            view.model = .init(showSignIn: false)
+            item.button?.toolTip = snap.message ?? "Error"
         }
 
         let signature = statusBarSignature(snap)
@@ -530,11 +557,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func statusBarSignature(_ snap: UsageSnapshot) -> String {
+        if snap.status == .needsLogin { return "signin" }
         guard snap.status == .ok else { return "\(snap.status.rawValue)|\(snap.message ?? "")" }
-        let fiveHour = snap.statusBarRows.first(where: { $0.label == "5H" }) ?? snap.statusBarRows.first
-        let pct = fiveHour?.percent ?? -1
-        let cool = Formatters.compactCountdown(until: fiveHour?.resetsAt)
-        return "\(pct)|\(cool)"
+        let primary = snap.menuBarPrimary
+        let pct = primary?.percent ?? -1
+        let cool = Formatters.compactCountdown(until: primary?.resetsAt)
+        let label = primary?.label ?? "?"
+        let near = snap.isNearLimitWarning ? "1" : "0"
+        return "\(label)|\(pct)|\(cool)|\(near)"
     }
 
     private func prettyPlan(_ oauth: ClaudeOAuthBlock) -> String {

@@ -79,6 +79,28 @@ struct UsageSnapshot: Codable, Equatable {
         }
         return result
     }
+
+    /// What the menu-bar strip should show.
+    /// Weekly at 100% owns the strip (percent + countdown) until it resets.
+    var menuBarPrimary: (label: String, percent: Int, resetsAt: Date?, tooltipPrefix: String)? {
+        let bars = statusBarRows
+        if let week = bars.first(where: { $0.label == "W" }), week.percent >= 100 {
+            return ("W", week.percent, week.resetsAt, "Weekly")
+        }
+        if let fiveHour = bars.first(where: { $0.label == "5H" }) ?? bars.first {
+            let prefix = fiveHour.label == "5H" ? "5-hour" : fiveHour.label
+            return (fiveHour.label, fiveHour.percent, fiveHour.resetsAt, prefix)
+        }
+        return nil
+    }
+
+    /// True when 5H or weekly is ≥90% and <100% (visual warning; does not change strip ownership).
+    var isNearLimitWarning: Bool {
+        let bars = statusBarRows
+        let five = bars.first(where: { $0.label == "5H" })?.percent ?? 0
+        let week = bars.first(where: { $0.label == "W" })?.percent ?? 0
+        return UsageDisplay.isNearLimit(percent: five) || UsageDisplay.isNearLimit(percent: week)
+    }
 }
 
 enum SharedStore {
