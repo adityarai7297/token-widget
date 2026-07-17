@@ -35,7 +35,9 @@ Click the menu bar icon → **Sign In…**
 | --- | --- |
 | App won’t open | Right-click → **Open**, or allow under **System Settings → Privacy & Security** |
 | Not signed in | Use **Sign In…** again and copy the browser code |
-| Numbers look old | Click **Refresh Now** |
+| Numbers look old | Click **Refresh Now** — if you see `· cached`, the last fetch was stale or rate-limited |
+| Weekly limit hit | The menu-bar strip turns red with a **W** badge and the weekly countdown until it resets |
+| Near the limit (≥90%) | Bar / ring go orange as a heads-up before you’re fully exhausted |
 
 ## Developers
 
@@ -46,7 +48,9 @@ brew install xcodegen
 ./build.sh
 ```
 
-Release / notarization notes: [docs/NOTARIZE.md](docs/NOTARIZE.md)
+If `xcodebuild` fails because only Command Line Tools are selected, install Xcode (or Xcode beta) — `build.sh` will pick it up automatically.
+
+Release / notarization notes: [docs/NOTARIZE.md](docs/NOTARIZE.md) · Changes: [CHANGELOG.md](CHANGELOG.md)
 
 ## License
 
