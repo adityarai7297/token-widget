@@ -14,6 +14,19 @@ if ! command -v xcodebuild >/dev/null 2>&1; then
   exit 1
 fi
 
+# Prefer a full Xcode when the active developer dir is Command Line Tools only.
+if [[ -z "${DEVELOPER_DIR:-}" ]] && ! xcodebuild -version >/dev/null 2>&1; then
+  for candidate in \
+    "/Applications/Xcode.app/Contents/Developer" \
+    "/Applications/Xcode-beta.app/Contents/Developer"; do
+    if [[ -d "$candidate" ]]; then
+      export DEVELOPER_DIR="$candidate"
+      echo "Using DEVELOPER_DIR=$DEVELOPER_DIR"
+      break
+    fi
+  done
+fi
+
 ARCH="$(uname -m)"
 case "$ARCH" in
   arm64|x86_64) ;;
