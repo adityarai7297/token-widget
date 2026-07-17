@@ -2,6 +2,7 @@ build/
 .DS_Store
 *.xcuserstate
 *.xcuserdata/
+xcuserdata/
 .env
 *_creds.json
 # Local runtime data (tokens + usage cache)
@@ -24,5 +25,5 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata/
-
+# Local scratch
+*.log
